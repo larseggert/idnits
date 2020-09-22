@@ -3117,15 +3117,21 @@ normalized ~ /[adfjmnos][a-z]+ [0-9]+, [12][0-9][0-9][0-9]$/	{
 									}
 								    }
 								}
-normalized ~ /[adfjmnos][a-z]+ [12][0-9][0-9][0-9]$/		{
-								    match($0, /[ADFJMNOS][a-z]+ [12][0-9][0-9][0-9]$/)
+normalized ~ /([0-9]+ )?[adfjmnos][a-z]+ [12][0-9][0-9][0-9]$/	{
+								    match($0, /([0-9]+ )?[ADFJMNOS][a-z]+ [12][0-9][0-9][0-9]$/)
 								    datestr = substr($0, RSTART, RLENGTH)
 								    if ((FNR < 30) && ($0 !~ "(Expires|Expiration [Dd]ate): *" datestr)) {
-									split(datestr, part, /[ ,]+/)
+									cnt = split(datestr, part, /[ ,]+/)
 
-									m = month[part[1]]
-									d = 15
-									y = part[2]
+									if (c == 2) {
+									    m = month[part[1]]
+									    d = 15
+									    y = part[2]
+									} else {
+									    m = month[part[2]]
+									    d = part[1]
+									    y = part[3]
+									}
 									isodate = sprintf("%s-%s-%s", y, m, d)
 									new_date = jdn(isodate)
 									if (new_date > doc_date) {
